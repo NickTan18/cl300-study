@@ -256,6 +256,46 @@ select.sel{font:inherit;font-size:14px;color:var(--ink);background:var(--surface
 .task.done span{color:var(--faint);text-decoration:line-through}
 .foot{margin-top:24px;padding-top:14px;border-top:1px solid var(--line-2);font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
 
+/* focus */
+.fhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:2px 0 12px}
+.fhead .cd{font-family:var(--display);font-weight:700;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.fhead .cd b{color:var(--accent)}
+.fhead .sub{font-size:13px;color:var(--muted);text-align:right}
+.fsec{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line-2)}
+.fcard{background:var(--surface);border:1px solid var(--line-2);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px;margin-bottom:10px}
+.fcard .ft{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.fcard .fn{font-family:var(--display);font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;line-height:1.05}
+.fcard .fwhy{font-size:13px;color:var(--muted);margin:4px 0 8px;line-height:1.4}
+.fcard .frow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mbar{flex:1;min-width:120px;height:8px;border-radius:4px;background:var(--line-2);overflow:hidden;display:flex}
+.mbar i{display:block;height:100%}
+.mbar .k{background:var(--ok)} .mbar .g{background:var(--caution)}
+.mtxt{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}
+.rate{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:2px}
+.rate button{padding:5px 9px;border-radius:6px;font-size:12.5px;font-weight:500;color:var(--muted)}
+.rate button[aria-pressed="true"]{color:var(--accent-ink)}
+.rate button[data-r="shaky"][aria-pressed="true"]{background:var(--warn)}
+.rate button[data-r="ok"][aria-pressed="true"]{background:var(--caution)}
+.rate button[data-r="solid"][aria-pressed="true"]{background:var(--ok)}
+.fstart{background:var(--surface);border:1px solid var(--line-2);border-radius:14px;box-shadow:var(--shadow);padding:14px;margin-bottom:6px;display:flex;flex-direction:column;gap:10px}
+.fstart .btn{width:100%}
+.frow2{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.subj{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line-2)}
+.subj:last-child{border-bottom:0}
+.subj .sn{font-weight:600;font-size:15px;cursor:pointer}
+.subj .sn:hover{color:var(--accent)}
+.subj .sm{grid-column:1 / -1;display:flex;gap:10px;align-items:center}
+.subj .sm .mtxt{white-space:normal;line-height:1.35}
+.subj .sm .mbar{flex:0 0 110px}
+.subj .pri{font-family:var(--mono);font-size:11px;color:var(--faint);margin-left:6px}
+.recap{background:var(--surface);border:1px solid var(--line-2);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:12px}
+.recap h2{font-family:var(--display);font-weight:700;font-size:30px;text-transform:uppercase;letter-spacing:.02em;margin:0 0 4px;line-height:1}
+.recap .big{font-family:var(--mono);font-size:15px;color:var(--ink-2);margin-bottom:10px}
+.recap .rm{display:block;width:100%;text-align:left;padding:8px 0;border-top:1px solid var(--line-2);font-size:14px}
+.recap .rm .rk{font-family:var(--mono);font-size:11px;color:var(--faint);margin-right:6px}
+.sprog{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sprog .mbar{height:6px}
+.sprog .mtxt{color:var(--ink-2)}
 /* guide */
 .guide{background:var(--surface);border:1px solid var(--line-2);border-radius:14px;padding:6px 20px 20px;font-size:15.5px;line-height:1.55}
 .guide h1{display:none}
@@ -302,7 +342,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
 
 <header><div class="wrap">
   <div class="hdr">
-    <div class="brand">CL300 Type Rating<small>FlightSafety Wilmington · PIC initial · 15–29 Sep</small></div>
+    <div class="brand">CL300 Type Rating<small>FlightSafety Wilmington · PIC initial · 15–29 Sep · <span id="ver">v14</span></small></div>
     <div class="hr"><div class="tot" id="tot"></div><button class="sbtn" id="sbtn" aria-label="Search" title="Search (/)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg></button></div>
   </div>
   <div class="srow" id="srow" hidden><input type="search" id="q" placeholder="Search everything — try 9400, VMO, hydraulic, bleed leak" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="link" id="sclose">Close</button></div>
@@ -314,7 +354,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
     <button class="tab" role="tab" data-t="quiz">Quiz <span class="n" id="n-quiz"></span></button>
     <button class="tab" role="tab" data-t="orals">Orals <span class="n" id="n-orals"></span></button>
     <button class="tab" role="tab" data-t="guide">Guide</button>
-    <button class="tab" role="tab" data-t="plan">Plan</button>
+    <button class="tab" role="tab" data-t="focus">Focus</button>
   </nav>
 </div></header>
 
@@ -358,11 +398,10 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
     <div class="guide" id="g-body"></div>
   </section>
   <section role="tabpanel" id="p-search" hidden><div id="c-search"></div></section>
-  <section role="tabpanel" id="p-plan" hidden>
-    <p class="note">Five days before the course, then a nightly rhythm for ground school and the sim. Adjust once you see the real syllabus on day one — the rhythm matters more than the exact chapter order.</p>
-    <div id="c-plan"></div>
+  <section role="tabpanel" id="p-focus" hidden>
+    <div id="c-focus"></div>
     <div class="foot">
-      <span>Progress is saved in this browser only. Keyboard: <kbd>space</kbd> reveal · <kbd>1</kbd> missed · <kbd>2</kbd> got it · <kbd>a</kbd>–<kbd>d</kbd> answer</span>
+      <span>Progress is saved in this browser only. Keyboard: <kbd>space</kbd> reveal · <kbd>1</kbd> missed · <kbd>2</kbd> got it · <kbd>a</kbd>–<kbd>d</kbd> answer · <kbd>/</kbd> search</span>
       <button class="link" id="reset">Reset all progress</button>
     </div>
   </section>
@@ -387,7 +426,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
 const D = JSON.parse(document.getElementById('data').textContent);
 const KEY='cl300-study-v1';
 const DAY=86400000, MIN=60000, INTERVALS=[0,10*MIN,1*DAY,3*DAY,7*DAY], INTERVAL_LABEL=['now','10 min','1 day','3 days','7 days'];
-let S={cards:{},quiz:{},plan:{},tab:'memory',mode:{memory:'due',limits:'due',systems:'due',joggers:'due',orals:'read',quiz:'all'},filt:{systems:'all',joggers:'all',orals:'',quiz:'all'},guide:0,shuf:{},jdir:'meaning',oralOpen:{}};
+let S={cards:{},quiz:{},plan:{},tab:'memory',mode:{memory:'due',limits:'due',systems:'due',joggers:'due',orals:'read',quiz:'all'},filt:{systems:'all',joggers:'all',orals:'',quiz:'all'},guide:0,shuf:{},jdir:'meaning',oralOpen:{},self:{},session:null,sessSize:25};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.cards){S=Object.assign(S,s); S.mode=Object.assign({memory:'due',limits:'due',systems:'due',joggers:'due',orals:'read',quiz:'all'},s.mode||{}); S.filt=Object.assign({systems:'all',joggers:'all',orals:'',quiz:'all'},s.filt||{}); S.oralOpen=s.oralOpen||{};}}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -459,6 +498,143 @@ function grade(sec,key,ok){
   r.due=now()+INTERVALS[r.box]; S.cards[key]=r; save();
   if(S.mode[sec]!=='due') cur[sec]++; // due mode: the card leaves the pool, index stays
   revealed=false; render();
+}
+
+// ---------- subjects ----------
+const SUBJ=[
+ {id:'gen',name:'Aircraft general',ch:['ch01','ch03'],w:1},
+ {id:'elec',name:'Electrical',ch:['ch02'],w:1.15},
+ {id:'cas',name:'CAS & warnings',ch:['ch04'],w:1},
+ {id:'fuel',name:'Fuel',ch:['ch05'],w:1},
+ {id:'apu',name:'APU',ch:['ch06'],w:1},
+ {id:'eng',name:'Powerplant',ch:['ch07'],w:1.1},
+ {id:'fire',name:'Fire protection',ch:['ch08'],w:1},
+ {id:'pneu',name:'Pneumatics & ice',ch:['ch09','ch10'],w:1.05},
+ {id:'ecs',name:'Air con, pressurization & O2',ch:['ch11','ch12','ch17'],w:1.15},
+ {id:'hyd',name:'Hydraulics',ch:['ch13'],w:1.15},
+ {id:'gear',name:'Gear & brakes',ch:['ch14'],w:1.05},
+ {id:'fcs',name:'Flight controls',ch:['ch15'],w:1.15},
+ {id:'avio',name:'Avionics',ch:['ch16a','ch16c','ch16f','ch16n'],w:1},
+ {id:'proc',name:'Procedures & performance',ch:['ch18','ch21'],w:1.1},
+];
+const SUBJ_BY={}; SUBJ.forEach(x=>SUBJ_BY[x.id]=x);
+const CH2S={}; SUBJ.forEach(x=>x.ch.forEach(c=>CH2S[c]=x.id));
+const MEM2S={'E-1':'ecs','E-2':'pneu','E-3':'ecs','E-4':'pneu','E-5':'ecs','E-6':'fire','E-7':'apu','E-8':'proc','E-9':'proc','E-10':'elec','E-11':'proc','E-12':'proc','E-13':'proc','E-14':'fcs','E-15':'fcs','E-16':'fcs','E-17':'fcs','E-18':'pneu','E-19':'pneu','E-20':'gear','E-21':'gear','E-22':'eng','E-23':'fire','E-24':'fire','E-25':'fire','E-26':'eng','E-27':'eng','E-28':'eng','E-29':'proc','E-30':'proc','E-31':'proc','E-32':'fire','E-33':'avio','E-34':'avio'};
+const LIM2S={'L-1':'proc','L-2':'proc','L-3':'avio','L-4':'avio','L-5':'proc','L-6':'proc','L-7':'proc','L-8':'gear','L-9':'fcs','L-10':'gear','L-11':'pneu','L-12':'pneu','L-13':'proc','L-14':'eng','L-15':'eng','L-16':'eng','L-17':'elec','L-18':'fcs','L-19':'fuel','L-20':'fuel','L-21':'fuel','L-22':'apu','L-23':'apu','L-24':'apu','L-25':'apu','L-26':'apu','L-27':'eng','L-28':'ecs','L-29':'ecs','L-30':'avio','L-31':'avio','L-32':'proc','L-33':'proc','L-34':'proc'};
+const JOG2S={'Aircraft General':'gen','Electrical':'elec','APU':'apu','Powerplant':'eng','Weight & Balance':'proc','Performance':'proc','Air Conditioning':'ecs','Ice & Rain':'pneu','Pressurization & Oxygen':'ecs','Fuel':'fuel','Hydraulics':'hyd','Flight Controls':'fcs','Landing Gear':'gear'};
+const FSI2S={'Aircraft General':'gen','Aural / Visual':'cas','Hydraulic System':'hyd','Air Conditioning':'ecs','Pressurization':'ecs','Icing Conditions':'pneu','AFCS':'avio','Landing Gear':'gear','Brakes':'gear','Avionics':'avio','Flight Controls':'fcs','Fuel':'fuel','Powerplant':'eng','APU':'apu','Electrical':'elec'};
+function subjOf(sec,c){
+  if(sec==='memory') return MEM2S[c.id]||'proc';
+  if(sec==='limits') return LIM2S[c.id]||'proc';
+  if(sec==='joggers') return JOG2S[c.section]||'proc';
+  if(sec==='systems') return c.ch==='fsi'?(FSI2S[c.section.replace('FSI card · ','')]||'gen'):(CH2S[c.ch]||'proc');
+  return 'proc';
+}
+// tag every drillable item once
+const ITEMS=[];
+['memory','limits','systems','joggers'].forEach(sec=>DECKS[sec].forEach(c=>{c.subj=subjOf(sec,c); c.sec=sec; ITEMS.push({kind:'card',sec,c,subj:c.subj,core:sec==='memory'||sec==='limits'})}));
+D.quiz.forEach(q=>{q.subj=CH2S[q.ch]||'proc'; ITEMS.push({kind:'quiz',q,subj:q.subj,core:false})});
+const SELF_W={shaky:1,ok:0.5,solid:0.12};
+function subjStats(id){
+  const its=ITEMS.filter(x=>x.subj===id); let total=0,seen=0,known=0,miss=0,hit=0,last=0,due=0,qr=0,qw=0;
+  for(const it of its){
+    if(it.kind==='card'){ total++; const r=rec(it.c.key); if(r.seen){seen++; miss+=r.miss; hit+=r.hit; if(r.box>=3) known++; const t=r.due-INTERVALS[r.box]; if(t>last) last=t;} if(isDue(it.c.key)) due++; }
+    else { const r=qrec(it.q.id); qr+=r.hit; qw+=r.miss; }
+  }
+  const n=miss+hit+qr+qw; const missRate=n?(miss+qw)/n:0; const mastery=total?known/total:0; const coverage=total?seen/total:0;
+  const staleDays=last?(now()-last)/DAY:null;
+  const dataW=seen===0?1:Math.min(1,0.45*(1-mastery)+0.35*missRate+0.2*Math.min(1,(staleDays||0)/4)+(n>=6&&missRate>0.4?0.2:0));
+  const conf=Math.min(1,n/40);
+  const self=(S.self||{})[id]; const selfW=self?SELF_W[self]:0.6;
+  const weak=conf*dataW+(1-conf)*selfW;
+  const pri=weak*SUBJ_BY[id].w;
+  return {id,total,seen,known,miss,hit,qr,qw,n,missRate,mastery,coverage,staleDays,due,dataW,conf,self,weak,pri};
+}
+function whyText(st){
+  const bits=[]; if(st.self) bits.push(st.self==='shaky'?'you said shaky':st.self==='ok'?'you said OK':'you said solid');
+  if(st.seen===0) bits.push('not started'); else { bits.push(st.known+'/'+st.total+' known'); if(st.n) bits.push(Math.round(st.missRate*100)+'% missed'); if(st.staleDays!=null) bits.push(st.staleDays<1?'today':Math.round(st.staleDays)+'d ago'); }
+  if(st.due) bits.push(st.due+' due');
+  return bits.join(' · ');
+}
+function daysLeft(){ const end=new Date(2026,8,29); const d=Math.ceil((end-new Date())/DAY); return d; }
+
+// ---------- sessions ----------
+function weightedPick(pool,n,wf){ const out=[]; const p=pool.slice(); while(out.length<n&&p.length){ let tot=0; const ws=p.map(x=>{const w=Math.max(.05,wf(x)); tot+=w; return w}); let r=Math.random()*tot, i=0; while(i<ws.length-1&&(r-=ws[i])>0) i++; out.push(p.splice(i,1)[0]); } return out; }
+function itemWeight(it){ let w=1; if(it.core) w*=1.5; if(it.kind==='card'){ const r=rec(it.c.key); if(!r.seen) w*=1.2; else if(r.box===0&&r.miss) w*=1.8; else if(isDue(it.c.key)) w*=1.4; else if(r.box>=3) w*=0.35; } else { const r=qrec(it.q.id); if(r.last===false) w*=1.8; else if(r.last===true) w*=0.4; else w*=1.1; } return w; }
+function buildSession(n,onlySubj){
+  const stats=SUBJ.map(x=>subjStats(x.id)).sort((a,b)=>b.pri-a.pri);
+  let picks=[];
+  if(onlySubj){ picks=weightedPick(ITEMS.filter(x=>x.subj===onlySubj),n,itemWeight); }
+  else {
+    const top=stats.slice(0,3), rest=stats.slice(3);
+    const nTop=Math.round(n*0.7), nRest=n-nTop;
+    const alloc=(group,count)=>{ const tot=group.reduce((s,x)=>s+x.pri,0)||1; const out=[]; let used=0; group.forEach((st,i)=>{ let k=i===group.length-1?count-used:Math.round(count*st.pri/tot); k=Math.max(0,Math.min(k,count-used)); used+=k; out.push(...weightedPick(ITEMS.filter(x=>x.subj===st.id),k,itemWeight)); }); return out; };
+    picks=[...alloc(top,nTop),...alloc(rest,nRest)];
+    // fill if short
+    if(picks.length<n){ const have=new Set(picks.map(p=>p.kind==='card'?p.c.key:'q'+p.q.id)); picks.push(...weightedPick(ITEMS.filter(x=>!have.has(x.kind==='card'?x.c.key:'q'+x.q.id)),n-picks.length,itemWeight)); }
+    picks=seeded(picks,Math.floor(Math.random()*100000)+1);
+  }
+  return picks.map(it=>it.kind==='card'?{kind:'card',sec:it.sec,key:it.c.key,subj:it.subj}:{kind:'quiz',id:it.q.id,subj:it.subj});
+}
+let sessAns=null;
+function startSession(n,onlySubj){ S.session={items:buildSession(n,onlySubj),i:0,hits:0,misses:0,missed:[],only:onlySubj||null,done:false,started:now()}; sessAns=null; revealed=false; save(); render(); window.scrollTo({top:0}); }
+function sessItem(){ const it=S.session.items[S.session.i]; if(!it) return null; if(it.kind==='card') return {kind:'card',sec:it.sec,c:DECKS[it.sec].find(x=>x.key===it.key),subj:it.subj}; return {kind:'quiz',q:D.quiz.find(x=>x.id===it.id),subj:it.subj}; }
+function sessAdvance(){ S.session.i++; sessAns=null; revealed=false; if(S.session.i>=S.session.items.length) S.session.done=true; save(); render(); window.scrollTo({top:0}); }
+function sessGrade(key,ok,label){ const r=rec(key); const wasKnown=r.box>=3; r.seen++; if(ok){r.hit++; r.box=Math.min(4,r.box+1); S.session.hits++;} else {r.miss++; r.box=0; S.session.misses++; S.session.missed.push({kind:'card',key,label});} r.due=now()+INTERVALS[r.box]; S.cards[key]=r; if(ok) celebrate($('.btn.hit'),!wasKnown&&r.box>=3); else streak=0; sessAdvance(); }
+function renderSession(host){
+  const se=S.session; const it=sessItem();
+  if(se.done||!it){
+    const st=se.only?subjStats(se.only):null;
+    host.innerHTML=`<div class="recap"><h2>Session done</h2><div class="big">${se.hits} right · ${se.misses} missed · ${Math.round(100*se.hits/Math.max(1,se.hits+se.misses))}%</div>
+      ${se.missed.length?`<div class="fsec" style="margin-top:6px">Missed — tap to review</div>`+se.missed.map((m,i)=>`<button class="rm" data-i="${i}"><span class="rk">${esc(SUBJ_BY[(se.items.find(x=>m.kind==='card'?x.key===m.key:x.id===m.id)||{}).subj]?.name||'')}</span>${esc(m.label)}</button>`).join(''):'<p class="note" style="margin-top:8px">Nothing missed. Solid.</p>'}
+      <div class="frow2" style="margin-top:12px"><button class="btn reveal" id="sess-again" style="flex:1">Another ${se.items.length}</button><button class="btn next" id="sess-close" style="flex:1">Back to Focus</button></div></div>`;
+    $$('.rm',host).forEach(b=>b.onclick=()=>{const m=se.missed[+b.dataset.i]; if(m.kind==='card'){const it2=se.items.find(x=>x.key===m.key); S.session=null; save(); pinCard(it2.sec,m.key)} else {S.session=null; save(); jumpQuiz(D.quiz.find(q=>q.id===m.id))}});
+    $('#sess-again').onclick=()=>startSession(se.items.length,se.only); $('#sess-close').onclick=()=>{S.session=null; save(); render()};
+    setActions([]); return;
+  }
+  const pct=Math.round(100*se.i/se.items.length);
+  let html=`<div class="sprog"><span class="mtxt">${se.i+1} / ${se.items.length}</span><div class="mbar"><i class="k" style="width:${pct}%"></i></div><button class="link" id="sess-quit">End</button></div>`;
+  if(it.kind==='card'){
+    const c=it.c, sec=it.sec;
+    html+=(sec==='memory'?memoryCard(c):sec==='limits'?limitCard(c):sec==='joggers'?joggerCard(c):sysCard(c));
+    host.innerHTML=html;
+    const label=sec==='memory'||sec==='limits'?c.id+' · '+c.title:sec==='joggers'?c.v+' — '+c.a:c.q;
+    if(!revealed) setActions([{cls:'reveal',label:'Reveal',sub:'space',fn:()=>{revealed=true;render()}}]);
+    else setActions([{cls:'miss',label:'Missed',sub:'1',fn:()=>sessGrade(c.key,false,label)},{cls:'hit',label:'Got it',sub:'2',fn:()=>sessGrade(c.key,true,label)}]);
+    $('#card').onclick=()=>{if(!revealed){revealed=true;render()}};
+    const ab=$('.askb',host); if(ab) ab.onclick=(e)=>{e.stopPropagation(); openAsk(cardCtx(sec,c))};
+  } else {
+    const q=it.q;
+    html+=`<div class="card" id="card"><div class="top"><span><span class="id">Ch ${esc(q.section.split(' ')[0])} · Q${q.n}</span> · PTM review question</span><button class="askb" data-ask>Ask</button></div>
+      <div class="body"><div class="kind">${esc(q.section)}</div><h2 class="q">${esc(q.q)}</h2><div class="opts">${['a','b','c','d'].map(k=>`<button class="opt ${sessAns?(k===q.answer?'right':(k===sessAns?'wrong':'')):''}" data-k="${k}" ${sessAns?'disabled':''}><span class="k">${k}</span><span>${esc(q.options[k])}</span></button>`).join('')}</div></div></div>`;
+    host.innerHTML=html;
+    $$('.opt',host).forEach(b=>b.onclick=()=>{ if(sessAns) return; sessAns=b.dataset.k; const r=qrec(q.id); const ok=sessAns===q.answer; if(ok){r.hit++;session.hit++;S.session.hits++} else {r.miss++;session.miss++;S.session.misses++;S.session.missed.push({kind:'quiz',id:q.id,label:q.q})} r.last=ok; S.quiz[q.id]=r; save(); if(ok) celebrate($('.opt[data-k="'+sessAns+'"]'),false); else streak=0; render(); });
+    const qa=$('.askb',host); if(qa) qa.onclick=()=>openAsk({key:'Q:'+q.id,label:'Quiz · '+q.section+' · Q'+q.n,text:'Review question: '+q.q+'\nOptions: '+['a','b','c','d'].map(k=>k+') '+q.options[k]).join('; ')+'\nAnswer key: '+q.answer});
+    if(sessAns) setActions([{cls:'next',label:'Next',sub:'→',fn:sessAdvance}]); else setActions([]);
+  }
+  $('#sess-quit').onclick=()=>{S.session.done=true; save(); render()};
+}
+
+// ---------- focus ----------
+function renderFocus(){
+  const host=$('#c-focus');
+  if(S.session){ renderSession(host); return; }
+  const stats=SUBJ.map(x=>subjStats(x.id)); const ranked=stats.slice().sort((a,b)=>b.pri-a.pri);
+  const d=daysLeft(); const rated=stats.filter(s=>s.self).length;
+  const size=S.sessSize||25;
+  let html=`<div class="fhead"><div class="cd"><b>${d>0?d:0}</b> day${d===1?'':'s'} to the ride</div><div class="sub">${rated<SUBJ.length?`Rate yourself on ${SUBJ.length-rated} more subject${SUBJ.length-rated===1?'':'s'} below`:'All subjects rated'}</div></div>`;
+  html+=`<div class="fstart"><div class="frow2"><span style="font-weight:600">Start a session</span><div class="seg" id="ssize">${[15,25,50].map(n=>`<button data-n="${n}" aria-pressed="${size===n}">${n}</button>`).join('')}</div></div><button class="btn reveal" id="sess-start">Start · ${size} items</button><p class="note" style="margin:0">About 70% from your top three focus subjects, the rest spread so nothing goes cold. Limits and memory items are weighted extra.</p></div>`;
+  html+=`<div class="fsec">Focus now</div>`;
+  html+=ranked.slice(0,3).map(st=>`<div class="fcard"><div class="ft"><span class="fn">${esc(SUBJ_BY[st.id].name)}</span><button class="link" data-drill="${st.id}">Drill 15</button></div><div class="fwhy">${esc(whyText(st))}</div><div class="frow"><div class="mbar"><i class="k" style="width:${st.mastery*100}%"></i><i class="g" style="width:${Math.max(0,st.coverage-st.mastery)*100}%"></i></div><span class="mtxt">${Math.round(st.mastery*100)}% known</span></div></div>`).join('');
+  html+=`<div class="fsec">All subjects — tap a name to drill it, rate how you feel</div><div class="fcard" style="padding-top:2px;padding-bottom:2px">`;
+  html+=ranked.map(st=>`<div class="subj"><span class="sn" data-drill="${st.id}">${esc(SUBJ_BY[st.id].name)}<span class="pri">${st.seen?Math.round(st.mastery*100)+'%':'new'}</span></span><div class="rate" data-s="${st.id}">${['shaky','ok','solid'].map(r=>`<button data-r="${r}" aria-pressed="${st.self===r}">${r==='ok'?'OK':r[0].toUpperCase()+r.slice(1)}</button>`).join('')}</div><div class="sm"><div class="mbar"><i class="k" style="width:${st.mastery*100}%"></i><i class="g" style="width:${Math.max(0,st.coverage-st.mastery)*100}%"></i></div><span class="mtxt">${esc(whyText(st))}</span></div></div>`).join('');
+  html+=`</div><p class="note">Green = known, amber = seen but not yet known. Your rating sets the starting point; as you drill, what you actually miss takes over.</p>`;
+  host.innerHTML=html;
+  $$('#ssize button').forEach(b=>b.onclick=()=>{S.sessSize=+b.dataset.n; save(); render()});
+  $('#sess-start').onclick=()=>startSession(size,null);
+  $$('[data-drill]',host).forEach(b=>b.onclick=()=>startSession(15,b.dataset.drill));
+  $$('.rate button',host).forEach(b=>b.onclick=()=>{const sid=b.closest('.rate').dataset.s; S.self=S.self||{}; S.self[sid]=S.self[sid]===b.dataset.r?null:b.dataset.r; save(); render()});
+  setActions([]);
 }
 
 // ---------- renderers ----------
@@ -620,13 +796,6 @@ function renderGuide(){
 }
 $('#g-prev').onclick=()=>{S.guide=(S.guide-1+D.chapters.length)%D.chapters.length;save();render();window.scrollTo({top:0})};
 $('#g-next').onclick=()=>{S.guide=(S.guide+1)%D.chapters.length;save();render();window.scrollTo({top:0})};
-
-// ---------- plan ----------
-function renderPlan(){
-  $('#c-plan').innerHTML=D.plan.map((ph,pi)=>`<div class="phase"><h3>${esc(ph.phase)}</h3>${ph.days.map((d,di)=>`<div class="day"><div class="dh"><span class="d">${esc(d.d)}</span><span class="t">${esc(d.theme)}</span></div>${d.items.map((it,ii)=>{const k=`${pi}.${di}.${ii}`;const on=!!S.plan[k];return `<label class="task${on?' done':''}"><input type="checkbox" id="pl-${pi}-${di}-${ii}" data-k="${k}" ${on?'checked':''}><span>${esc(it)}</span></label>`}).join('')}</div>`).join('')}</div>`).join('');
-  $$('#c-plan input').forEach(i=>i.onchange=()=>{S.plan[i.dataset.k]=i.checked;save();i.closest('.task').classList.toggle('done',i.checked)});
-  setActions([]);
-}
 
 // ---------- offline explain engine ----------
 const STOP=new Set('the and for with that this from when which what into only than then have are not all any each its per after before above below during while must may can will used use also more less both either over under out off via one two three ft kts psi min max minimum maximum system systems aircraft engine engines left right flight takeoff landing ground normal message caution warning status advisory switch valve valves pressure temperature altitude speed time limit limits limitation limitations ptm fsi afm fcom card cards ref page chapter with without between through should would could there their they them these those about into onto upon such other same most some very just been being were was has had does done'.split(' '));
@@ -828,11 +997,12 @@ qEl.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeSearch(); render()
 function render(){
   const searching=query.trim().length>=2;
   $$('.tab').forEach(t=>t.setAttribute('aria-selected',!searching&&t.dataset.t===S.tab));
-  ['memory','limits','systems','joggers','orals','quiz','guide','plan'].forEach(p=>$('#p-'+p).hidden=searching||p!==S.tab);
+  if(S.tab==='plan') S.tab='focus';
+  ['memory','limits','systems','joggers','orals','quiz','guide','focus'].forEach(p=>$('#p-'+p).hidden=searching||p!==S.tab);
   $('#p-search').hidden=!searching;
   if(searching){renderSearch(); setActions([]); updateTot(); return;}
   if(S.tab==='memory'||S.tab==='limits'||S.tab==='systems'||S.tab==='joggers') renderDeck(S.tab);
-  else if(S.tab==='orals') renderOrals(); else if(S.tab==='quiz') renderQuiz(); else if(S.tab==='guide') renderGuide(); else renderPlan();
+  else if(S.tab==='orals') renderOrals(); else if(S.tab==='quiz') renderQuiz(); else if(S.tab==='guide') renderGuide(); else renderFocus();
   updateTot();
 }
 function updateTot(){
@@ -845,13 +1015,15 @@ $$('.tab').forEach(t=>t.onclick=()=>{S.tab=t.dataset.t;revealed=false;answered=n
 $$('.seg button').forEach(b=>b.onclick=()=>{const sec=b.closest('.seg').dataset.for;S.mode[sec]=b.dataset.m;cur[sec]=0;revealed=false;answered=null;pin=null;save();render()});
 $$('[data-shuffle]').forEach(b=>b.onclick=()=>{const s=b.dataset.shuffle;S.shuf[s]=S.shuf[s]?0:(Math.floor(Math.random()*100000)+1);b.textContent=S.shuf[s]?'Unshuffle':'Shuffle';cur[s]=0;revealed=false;answered=null;pin=null;save();render()});
 $$('[data-shuffle]').forEach(b=>{if(S.shuf[b.dataset.shuffle])b.textContent='Unshuffle'});
-$('#reset').onclick=()=>{if(confirm('Reset all progress? This clears card boxes, quiz history and plan checkboxes.')){S.cards={};S.quiz={};S.plan={};session={hit:0,miss:0};save();render()}};
+$('#reset').onclick=()=>{if(confirm('Reset all progress? This clears card boxes, quiz history and plan checkboxes.')){S.cards={};S.quiz={};S.plan={};S.self={};S.session=null;session={hit:0,miss:0};save();render()}};
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='SELECT'||e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
   if(!$('#sheet').hidden){ if(e.key==='Escape') closeAsk(); return }
   if(e.key==='/'){e.preventDefault(); openSearch(); return}
   if(query.trim().length>=2) return;
-  const deck=['memory','limits','systems','joggers'].includes(S.tab)||(S.tab==='orals'&&S.mode.orals!=='read');
+  const inSess=S.tab==='focus'&&S.session&&!S.session.done; const sit=inSess?sessItem():null;
+  if(inSess&&sit&&sit.kind==='quiz'){ if(/^[a-d]$/.test(e.key)&&!sessAns){const b=$('.opt[data-k="'+e.key+'"]');b&&b.click()} else if((e.key==='ArrowRight'||e.key===' '||e.key==='Enter')&&sessAns){e.preventDefault();sessAdvance()} return }
+  const deck=['memory','limits','systems','joggers'].includes(S.tab)||(S.tab==='orals'&&S.mode.orals!=='read')||(inSess&&sit&&sit.kind==='card');
   if(deck){ if(e.key===' '||e.key==='Enter'){e.preventDefault();if(!revealed){revealed=true;render()}} else if(e.key==='1'&&revealed){actionsList[0]&&actionsList[0].fn()} else if(e.key==='2'&&revealed){actionsList[1]&&actionsList[1].fn()} }
   else if(S.tab==='quiz'){ if(/^[a-d]$/.test(e.key)&&!answered){const b=$('.opt[data-k="'+e.key+'"]');b&&b.click()} else if((e.key==='ArrowRight'||e.key===' '||e.key==='Enter')&&answered){e.preventDefault();answered=null;cur.quiz++;render()} }
 });
