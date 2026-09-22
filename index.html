@@ -59,6 +59,8 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid 
 /* header */
 header{position:sticky;top:0;z-index:20;background:var(--ground);border-bottom:1px solid var(--line-2)}
 .hdr{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:12px 0 6px}
+.hdr>.brand{flex:1 1 auto;min-width:0}
+.hdr>.hr{flex:0 0 auto}
 .brand{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:.02em;text-transform:uppercase;line-height:1}
 .brand small{display:block;font-family:var(--body);font-weight:500;font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-top:4px}
 .hr{display:flex;align-items:center;gap:10px}
@@ -193,7 +195,16 @@ select.sel{font:inherit;font-size:14px;color:var(--ink);background:var(--surface
 .xhook{background:var(--caution-soft);border-radius:8px;padding:6px 10px;display:inline-block}
 .figs{display:flex;align-items:flex-start;gap:10px;overflow-x:auto;padding:2px 0 8px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
 .fig{flex:0 0 156px;text-align:left;scroll-snap-align:start}
-.fig img{display:block;width:156px;height:104px;object-fit:cover;object-position:top;border-radius:8px;border:1px solid var(--line);background:#fff}
+.fig .fimg{display:block;width:156px;height:104px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);overflow:hidden;position:relative}
+.fig .fimg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:shimmer 1.4s infinite}
+.fig .fimg.ok::after{content:none}
+.fig .fimg img{display:block;width:100%;height:100%;object-fit:cover;object-position:top;background:#fff;opacity:0;transition:opacity .2s}
+.fig .fimg.ok img{opacity:1}
+.fig.nofig .fimg{background:var(--warn-soft)} .fig.nofig .fimg::after{content:none}
+.fignote{font-size:13px;color:var(--warn);margin:4px 0 8px}
+.lbmsg{position:absolute;left:0;right:0;top:40%;text-align:center;color:#555;font-size:15px;padding:0 20px}
+.lbwrap{position:relative}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 .fig span{display:block;font-size:12px;line-height:1.3;margin-top:5px;color:var(--ink-2)}
 .fig span b{font-family:var(--mono);font-weight:500;color:var(--faint);margin-right:4px}
 .gfigs{margin:10px 0 6px}
@@ -226,15 +237,17 @@ select.sel{font:inherit;font-size:14px;color:var(--ink);background:var(--surface
 .snote{font-size:11.5px;color:var(--faint);margin-top:8px;line-height:1.4}
 @media (max-width:480px){
   .hdr{padding:10px 0 4px;gap:8px}
-  .brand{font-size:20px;white-space:nowrap}
-  .brand small{font-size:9.5px;letter-spacing:.1em;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62vw}
+  .brand{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand small{font-size:9.5px;letter-spacing:.1em;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .tot{font-size:11px}
+  .hdr{align-items:center;gap:8px}
   .tab{padding:7px 9px;font-size:15px}
   .tabs{gap:2px}
   .guide h2{font-size:22px}
   #g-body>h2:first-child{font-size:22px!important;padding-top:6px!important}
   .stat .l{font-size:11px}
 }
+@media (max-width:400px){ .brand{font-size:17px} .brand small{font-size:9px} }
 @media (pointer:coarse){
   .rate button{padding:10px 11px}
   .link{padding:9px 6px;margin:-9px -6px}
@@ -242,7 +255,7 @@ select.sel{font:inherit;font-size:14px;color:var(--ink);background:var(--surface
   .seg button{padding:9px 12px;font-size:14px}
   .rate button{padding:8px 11px;font-size:13px}
   .chip{padding:9px 13px;font-size:14px}
-  .fig{flex-basis:168px} .fig img{width:168px;height:112px}
+  .fig{flex-basis:168px} .fig .fimg{width:168px;height:112px}
   .lbbar .link{padding:12px 8px;margin:0}
   .rm{padding:11px 0}
   #g-prev,#g-next{padding:10px 8px}
@@ -397,7 +410,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
 
 <header><div class="wrap">
   <div class="hdr">
-    <div class="brand">CL300 Type Rating<small>FlightSafety Wilmington · PIC initial · 15–29 Sep · <span id="ver">v19</span></small></div>
+    <div class="brand">CL300 Type Rating<small>FlightSafety Wilmington · PIC initial · 15–29 Sep · <span id="ver">v20</span></small></div>
     <div class="hr"><div class="tot" id="tot"></div><button class="sbtn" id="sbtn" aria-label="Search" title="Search (/)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg></button></div>
   </div>
   <div class="srow" id="srow" hidden><input type="search" id="q" placeholder="Search everything — try 9400, VMO, hydraulic, bleed leak" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="link" id="sclose">Close</button></div>
@@ -462,7 +475,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
   </section>
 </main>
 <div class="actions" id="actions" hidden><div class="in" id="act-in"></div></div>
-<div class="lb" id="lb" hidden role="dialog" aria-label="Figure"><div class="lbbar"><button class="link" id="lbprev">‹ Prev</button><span class="lbt" id="lbt"></span><button class="link" id="lbnext">Next ›</button><button class="link" id="lbx">Close</button></div><div class="lbwrap" id="lbwrap"><img id="lbimg" alt=""></div><div class="lbhint" id="lbhint">Tap to zoom · pinch to zoom · drag to pan</div></div>
+<div class="lb" id="lb" hidden role="dialog" aria-label="Figure"><div class="lbbar"><button class="link" id="lbprev">‹ Prev</button><span class="lbt" id="lbt"></span><button class="link" id="lbnext">Next ›</button><button class="link" id="lbx">Close</button></div><div class="lbwrap" id="lbwrap"><div class="lbmsg" id="lbmsg" hidden></div><img id="lbimg" alt=""></div><div class="lbhint" id="lbhint">Tap to zoom · pinch to zoom · drag to pan</div></div>
 <div class="sheetbg" id="sheetbg" hidden></div>
 <div class="sheet" id="sheet" hidden role="dialog" aria-label="Ask about this">
   <div class="sh"><div><div class="kind">Ask about</div><div class="slabel" id="slabel"></div></div><button class="link" id="sclosebtn">Close</button></div>
@@ -1044,8 +1057,24 @@ function renderOffline(ctx){
 
 // ---------- figures ----------
 const FIGS=D.figs||[];
-function figHTML(list){ return `<div class="figs">${list.map(f=>`<button class="fig" data-fig="${esc(f.fig)}"><img src="img/t-${esc(f.fig)}.jpg" loading="lazy" alt="" onerror="this.closest('.fig').hidden=true"><span><b>${esc(f.fig)}</b>${esc(f.title)}</span></button>`).join('')}</div>`; }
-function bindFigs(host,list){ $$('.fig',host).forEach(b=>b.onclick=()=>openFig(list,list.findIndex(f=>f.fig===b.dataset.fig))); }
+// Figures ship as one JSON pack per system (figs/<subj>.json → {fig: {t: base64 thumb, f: base64 full}}).
+// A pack is fetched the first time one of its figures is needed and kept for the session.
+const FIGPACK={};
+function loadPack(subj){
+  if(FIGPACK[subj]) return FIGPACK[subj];
+  FIGPACK[subj]=fetch('figs/'+subj+'.json').then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }).then(pk=>{
+    const m={}; for(const fg in pk) m[fg]={t:'data:image/jpeg;base64,'+pk[fg].t,f:'data:image/jpeg;base64,'+pk[fg].f}; return m;
+  }).catch(e=>{ delete FIGPACK[subj]; throw e; });
+  return FIGPACK[subj];
+}
+const FIG_MISSING_MSG='The figure files aren\u2019t on this copy of the site yet \u2014 the figs folder needs to sit next to index.html.';
+function figHTML(list){ return `<div class="figs">${list.map(f=>`<button class="fig" data-fig="${esc(f.fig)}"><span class="fimg"><img alt="" data-subj="${esc(f.subj)}"></span><span><b>${esc(f.fig)}</b>${esc(f.title)}</span></button>`).join('')}</div><div class="fignote" hidden></div>`; }
+function bindFigs(host,list){
+  $$('.fig',host).forEach(b=>b.onclick=()=>openFig(list,list.findIndex(f=>f.fig===b.dataset.fig)));
+  const subs=[...new Set(list.map(f=>f.subj))]; let failed=false;
+  subs.forEach(sj=>loadPack(sj).then(m=>{ $$('.fig img[data-subj="'+sj+'"]',host).forEach(img=>{ const fg=img.closest('.fig').dataset.fig; if(m[fg]){ img.src=m[fg].t; img.closest('.fimg').classList.add('ok'); } }); })
+    .catch(()=>{ if(failed) return; failed=true; const n=$('.fignote',host); if(n){ n.hidden=false; n.textContent=FIG_MISSING_MSG; } $$('.fig',host).forEach(b=>b.classList.add('nofig')); }));
+}
 // Word rarity across the figure set: a word used by figures in 4+ systems ("panel", "system", "emergency") barely counts;
 // a word that only one system's figures use ("reservoir", "squib", "pusher") counts fully.
 const FIG_IDF=(()=>{ const m={}; FIGS.forEach(f=>{ const ws=new Set((f.title+' '+(f.kw||'')+' '+(f.lab||'')).toLowerCase().match(/[a-z][a-z0-9\-\/]{1,}/g)||[]); ws.forEach(w=>{ (m[w]=m[w]||new Set()).add(f.subj) }) }); const idf={}; for(const w in m){ const n=m[w].size; idf[w]=n>=4?0.15:n===3?0.4:n===2?0.7:1 } return idf; })();
@@ -1080,7 +1109,9 @@ function figsFor(ctx,terms){
 }
 let lbList=[], lbI=0, lbZoom=1;
 function openFig(list,i){ lbList=list; lbI=Math.max(0,i); showFig(); $('#lb').hidden=false; document.body.style.overflow='hidden'; }
-function showFig(){ const f=lbList[lbI]; if(!f) return; const img=$('#lbimg'); lbZoom=1; img.style.width='100%'; img.src='img/f-'+f.fig+'.jpg'; $('#lbt').textContent='Figure '+f.fig+' · '+f.title; $('#lbprev').disabled=lbI===0; $('#lbnext').disabled=lbI>=lbList.length-1; $('#lbwrap').scrollTo(0,0); }
+function showFig(){ const f=lbList[lbI]; if(!f) return; const img=$('#lbimg'); lbZoom=1; img.style.width='100%'; img.removeAttribute('src'); $('#lbmsg').textContent='Loading\u2026'; $('#lbmsg').hidden=false;
+  $('#lbt').textContent='Figure '+f.fig+' · '+f.title; $('#lbprev').disabled=lbI===0; $('#lbnext').disabled=lbI>=lbList.length-1; $('#lbwrap').scrollTo(0,0);
+  loadPack(f.subj).then(m=>{ if(lbList[lbI]!==f) return; if(m[f.fig]){ img.src=m[f.fig].f; $('#lbmsg').hidden=true; } else { $('#lbmsg').textContent='This figure is missing from the pack.'; } }).catch(()=>{ if(lbList[lbI]===f) $('#lbmsg').textContent=FIG_MISSING_MSG; }); }
 function closeFig(){ $('#lb').hidden=true; $('#lbimg').removeAttribute('src'); document.body.style.overflow=''; }
 function setZoom(z,cx,cy){ // keep the point (cx,cy) in the viewport fixed while zooming
   const w=$('#lbwrap'), img=$('#lbimg'); z=Math.max(1,Math.min(5,z)); const r=z/lbZoom; if(r===1) return;
