@@ -294,10 +294,10 @@ select.sel{font:inherit;font-size:14px;color:var(--ink);background:var(--surface
 .rm{display:block;width:100%;text-align:left;padding:8px 0;border-top:1px solid var(--line-2);font-size:14px;line-height:1.35}
 .rm .rk{font-family:var(--mono);font-size:11px;color:var(--faint);margin-right:6px;white-space:nowrap}
 .rm.open{color:var(--accent)}
-.rx{padding:0 0 12px 0;font-size:14px;color:var(--ink-2)}
-.rx .rxa{background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;padding:8px 10px;line-height:1.45}
-.rx .xblk p{font-size:14px}
-.rx .link{margin-top:6px}
+.rcx{padding:0 0 12px 0;font-size:14px;color:var(--ink-2)}
+.rcx .rxa{background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;padding:8px 10px;line-height:1.45}
+.rcx .xblk p{font-size:14px}
+.rcx .link{margin-top:6px}
 .fhead .cd2{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
 .delta{font-family:var(--mono);font-size:11px;font-weight:600}
 .delta.up{color:var(--ok)} .delta.dn{color:var(--warn)}
@@ -360,7 +360,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
 
 <header><div class="wrap">
   <div class="hdr">
-    <div class="brand">CL300 Type Rating<small>FlightSafety Wilmington · PIC initial · 15–29 Sep · <span id="ver">v15</span></small></div>
+    <div class="brand">CL300 Type Rating<small>FlightSafety Wilmington · PIC initial · 15–29 Sep · <span id="ver">v17</span></small></div>
     <div class="hr"><div class="tot" id="tot"></div><button class="sbtn" id="sbtn" aria-label="Search" title="Search (/)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg></button></div>
   </div>
   <div class="srow" id="srow" hidden><input type="search" id="q" placeholder="Search everything — try 9400, VMO, hydraulic, bleed leak" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="link" id="sclose">Close</button></div>
@@ -412,7 +412,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-b
   </section>
   <section role="tabpanel" id="p-guide" hidden>
     <div class="gnav"><select class="sel" id="g-sel" aria-label="Chapter"></select><button class="link" id="g-prev">‹ Prev</button><button class="link" id="g-next">Next ›</button></div>
-    <p class="note">Written from the FlightSafety Pilot Training Manual (2nd Ed. Rev 3.2). Numbers were pulled from the text, not the figures — anything tagged <span class="guide"><span class="flag warn">verify</span></span> should be checked against the printed page. Where the instructor or AFM differs, they win.</p>
+    <p class="note">Written from the FlightSafety Pilot Training Manual (2nd Ed. Rev 3.2). Numbers were pulled from the text, not the figures — anything tagged <span class="flag warn">verify</span> should be checked against the printed page. Where the instructor or AFM differs, they win.</p>
     <div class="guide" id="g-body"></div>
   </section>
   <section role="tabpanel" id="p-search" hidden><div id="c-search"></div></section>
@@ -487,12 +487,15 @@ function celebrate(el,graduated){
   const milestone=[5,10,25,50,100,200].includes(streak);
   burst(r.left+r.width/2, r.top+r.height/2, milestone?110:graduated?60:30, milestone||graduated);
   if(milestone) toast(streak+' in a row');
-  const card=$('#card'); if(card){card.classList.remove('hit'); void card.offsetWidth; card.classList.add('hit')}
+  const card=$('#p-'+S.tab+' #card'); if(card){card.classList.remove('hit'); void card.offsetWidth; card.classList.add('hit')}
 }
 
 // ---------- decks ----------
 const DECKS={memory:D.memory.map(c=>({key:'E:'+c.id,...c})), limits:D.limits.map(c=>({key:'L:'+c.id,...c})), systems:D.systems.map(c=>({key:'S:'+c.id,...c})), joggers:D.joggers.map(c=>({key:'J:'+c.id,...c})), orals:D.orals.flatMap(o=>o.qa.map(q=>({key:'O:'+o.id+':'+q.n,id:o.id+'-'+q.n,oral:o.id,oralTitle:o.title,scenario:o.scenario,...q})))};
-if(!S.filt.orals&&D.orals.length) S.filt.orals=D.orals[0].id;
+if((!S.filt.orals||(S.filt.orals!=='all'&&!D.orals.some(o=>o.id===S.filt.orals)))&&D.orals.length) S.filt.orals=D.orals[0].id;
+if(!(S.guide>=0&&S.guide<D.chapters.length)) S.guide=0;
+// a session saved by an older build may point at cards that no longer exist — drop it rather than crash
+try{ if(S.session&&!(S.session.items||[]).every(it=>it.kind==='card'?!!(DECKS[it.sec]&&DECKS[it.sec].some(x=>x.key===it.key)):D.quiz.some(q=>q.id===it.id))) S.session=null; }catch(e){ S.session=null; }
 function rec(key){return S.cards[key]||{box:0,due:0,seen:0,miss:0,hit:0}}
 function lastSeen(r){return r.seen?r.due-INTERVALS[r.box]:0}
 // Course dates (Focus tab → Dates). In the last 4 days before the oral / the ride, anything not seen for 2 days comes due again.
@@ -521,9 +524,11 @@ const cur={memory:0,limits:0,systems:0,joggers:0,orals:0,quiz:0}; let revealed=f
 function grade(sec,key,ok){
   const r=rec(key); const wasKnown=r.box>=3; r.seen++; if(ok){r.hit++; r.box=Math.min(4,r.box+1);} else {r.miss++; r.box=0;}
   if(ok) celebrate($('.btn.hit'), !wasKnown&&r.box>=3); else streak=0;
-  pin=null;
+  const wasPinned=!!pin; pin=null;
   r.due=now()+INTERVALS[r.box]; S.cards[key]=r; save();
-  if(S.mode[sec]!=='due') cur[sec]++; // due mode: the card leaves the pool, index stays
+  // advance only when the graded card stays in the list at this index: All mode always; Missed mode only if it is still box 0–1.
+  // Due mode: the card leaves the pool, index stays. A pinned card was shown outside the list, so the index is untouched.
+  if(!wasPinned&&(S.mode[sec]==='all'||(S.mode[sec]==='missed'&&r.box<=1))) cur[sec]++;
   revealed=false; render();
 }
 
@@ -634,7 +639,7 @@ function buildSession(n,only,exclude){
 }
 let sessAns=null, tmr=0, timedOut=false, recapOpen={};
 function startSession(n,only,exclude){ const items=buildSession(n,only,exclude); if(!items.length){toast('Nothing to drill there yet'); return} S.session={items,i:0,hits:0,misses:0,missed:[],hitKeys:[],only:only||null,mode:S.sessMode,done:false,started:now()}; sessAns=null; revealed=false; timedOut=false; recapOpen={}; save(); render(); window.scrollTo({top:0}); }
-function sessItem(){ const it=S.session.items[S.session.i]; if(!it) return null; if(it.kind==='card') return {kind:'card',sec:it.sec,c:DECKS[it.sec].find(x=>x.key===it.key),subj:it.subj,ex:it.ex}; return {kind:'quiz',q:D.quiz.find(x=>x.id===it.id),subj:it.subj}; }
+function sessItem(){ const it=S.session.items[S.session.i]; if(!it) return null; if(it.kind==='card'){ const c=DECKS[it.sec]&&DECKS[it.sec].find(x=>x.key===it.key); return c?{kind:'card',sec:it.sec,c,subj:it.subj,ex:it.ex}:null; } const q=D.quiz.find(x=>x.id===it.id); return q?{kind:'quiz',q,subj:it.subj}:null; }
 function sessAdvance(){ S.session.i++; sessAns=null; revealed=false; timedOut=false; if(S.session.i>=S.session.items.length){ S.session.done=true; try{snapshot()}catch(e){} } save(); render(); window.scrollTo({top:0}); }
 function sessGrade(key,ok,label){ const r=rec(key); const wasKnown=r.box>=3; r.seen++; if(ok){r.hit++; r.box=Math.min(4,r.box+1); S.session.hits++; (S.session.hitKeys=S.session.hitKeys||[]).push(key);} else {r.miss++; r.box=0; S.session.misses++; S.session.missed.push({kind:'card',key,label});} r.due=now()+INTERVALS[r.box]; S.cards[key]=r; if(ok) celebrate($('.btn.hit'),!wasKnown&&r.box>=3); else streak=0; sessAdvance(); }
 function explainHTML(ex){ const i=ex.examiner.indexOf(' — '); const q=i>0?ex.examiner.slice(0,i):ex.examiner, a=i>0?ex.examiner.slice(i+3):''; return `<div class="xblk"><div class="xh">Why</div><p>${esc(ex.why)}</p><div class="xh">How the examiner asks it</div><p class="xq">${esc(q)}</p>${a?`<p>${esc(a)}</p>`:''}${ex.hook?`<div class="xh">Hook</div><p><span class="xhook">${esc(ex.hook)}</span></p>`:''}${ex.refs&&ex.refs.length?`<div class="xrefs">${esc(ex.refs.join(' · '))}</div>`:''}</div>`; }
@@ -651,7 +656,7 @@ function renderSession(host){
     const modeTxt=se.only==='trouble'?'Trouble drill':se.only?SUBJ_BY[se.only].name:se.mode==='exam'?'Examiner session':'Mixed session';
     host.innerHTML=`<div class="recap"><h2>Session done</h2><div class="big">${esc(modeTxt)} · ${se.hits} right · ${se.misses} missed · ${Math.round(100*se.hits/Math.max(1,se.hits+se.misses))}%</div>
       ${se.missed.length?`<div class="fsec" style="margin-top:6px">Missed — tap one for the answer and the why</div>`+se.missed.map((m,i)=>{ const sit=se.items.find(x=>m.kind==='card'?x.key===m.key:x.id===m.id)||{}; const open=!!recapOpen[i]; const ex=m.kind==='card'&&D.explain&&D.explain[m.key];
-        return `<button class="rm${open?' open':''}" data-i="${i}"><span class="rk">${esc(SUBJ_BY[sit.subj]?.name||'')}</span>${esc(m.label)}</button>${open?`<div class="rx"><div class="rxa">${esc(sessAnswer(m))}</div>${ex?explainHTML(ex):''}<button class="link" data-open="${i}">Open the card</button></div>`:''}`; }).join(''):'<p class="note" style="margin-top:8px">Nothing missed. Solid.</p>'}
+        return `<button class="rm${open?' open':''}" data-i="${i}"><span class="rk">${esc(SUBJ_BY[sit.subj]?.name||'')}</span>${esc(m.label)}</button>${open?`<div class="rcx"><div class="rxa">${esc(sessAnswer(m))}</div>${ex?explainHTML(ex):''}<button class="link" data-open="${i}">Open the card</button></div>`:''}`; }).join(''):'<p class="note" style="margin-top:8px">Nothing missed. Solid.</p>'}
       <div class="frow2" style="margin-top:12px"><button class="btn reveal" id="sess-again" style="flex:1">Another ${se.items.length}</button><button class="btn next" id="sess-close" style="flex:1">Back to Focus</button></div>
       ${excl.size?`<p class="note" style="margin:8px 0 0">Another skips the ${excl.size} you just got right.</p>`:''}</div>`;
     $$('.rm',host).forEach(b=>b.onclick=()=>{const i=+b.dataset.i; recapOpen[i]=!recapOpen[i]; render()});
@@ -663,6 +668,7 @@ function renderSession(host){
   let html=`<div class="sprog"><span class="mtxt">${se.i+1} / ${se.items.length}</span><div class="mbar"><i class="k" style="width:${pct}%"></i></div><button class="link" id="sess-quit">End</button></div>`;
   if(it.kind==='card'){
     const c=it.c, sec=it.sec; const exam=!!(it.ex&&D.explain&&D.explain[c.key]);
+    if(!revealed) timedOut=false;
     const secs=(!revealed&&S.timer&&(exam||sec==='memory'||sec==='limits'||sec==='joggers'))?S.timer*((exam||sec==='memory')?2:1):0;
     if(secs) html+=`<div class="tbar" id="tbar"><i style="transition:width ${secs}s linear"></i></div>`;
     if(revealed&&timedOut) html+=`<div class="tout">Out of time — call it missed unless you had it</div>`;
@@ -672,14 +678,14 @@ function renderSession(host){
     const label=itemLabel({kind:'card',sec,c});
     if(!revealed) setActions([{cls:'reveal',label:'Reveal',sub:'space',fn:()=>{revealed=true;render()}}]);
     else setActions([{cls:'miss',label:'Missed',sub:'1',fn:()=>sessGrade(c.key,false,label)},{cls:'hit',label:'Got it',sub:'2',fn:()=>sessGrade(c.key,true,label)}]);
-    $('#card').onclick=()=>{if(!revealed){revealed=true;render()}};
+    const cardEl=$('#card',host); if(cardEl) cardEl.onclick=()=>{if(!revealed){revealed=true;render()}};
     const ab=$('.askb',host); if(ab) ab.onclick=(e)=>{e.stopPropagation(); openAsk(cardCtx(sec,c))};
   } else {
     const q=it.q;
     html+=`<div class="card" id="card"><div class="top"><span><span class="id">Ch ${esc(q.section.split(' ')[0])} · Q${q.n}</span> · PTM review question</span><button class="askb" data-ask>Ask</button></div>
       <div class="body"><div class="kind">${esc(q.section)}</div><h2 class="q">${esc(q.q)}</h2><div class="opts">${['a','b','c','d'].map(k=>`<button class="opt ${sessAns?(k===q.answer?'right':(k===sessAns?'wrong':'')):''}" data-k="${k}" ${sessAns?'disabled':''}><span class="k">${k}</span><span>${esc(q.options[k])}</span></button>`).join('')}</div></div></div>`;
     host.innerHTML=html;
-    $$('.opt',host).forEach(b=>b.onclick=()=>{ if(sessAns) return; sessAns=b.dataset.k; const r=qrec(q.id); const ok=sessAns===q.answer; if(ok){r.hit++;session.hit++;S.session.hits++;(S.session.hitKeys=S.session.hitKeys||[]).push('q'+q.id)} else {r.miss++;session.miss++;S.session.misses++;S.session.missed.push({kind:'quiz',id:q.id,label:q.q})} r.last=ok; S.quiz[q.id]=r; save(); if(ok) celebrate($('.opt[data-k="'+sessAns+'"]'),false); else streak=0; render(); });
+    $$('.opt',host).forEach(b=>b.onclick=()=>{ if(sessAns) return; sessAns=b.dataset.k; const r=qrec(q.id); const ok=sessAns===q.answer; if(ok){r.hit++;S.session.hits++;(S.session.hitKeys=S.session.hitKeys||[]).push('q'+q.id)} else {r.miss++;S.session.misses++;S.session.missed.push({kind:'quiz',id:q.id,label:q.q})} r.last=ok; S.quiz[q.id]=r; save(); if(ok) celebrate($('.opt[data-k="'+sessAns+'"]'),false); else streak=0; render(); });
     const qa=$('.askb',host); if(qa) qa.onclick=()=>openAsk({key:'Q:'+q.id,label:'Quiz · '+q.section+' · Q'+q.n,text:'Review question: '+q.q+'\nOptions: '+['a','b','c','d'].map(k=>k+') '+q.options[k]).join('; ')+'\nAnswer key: '+q.answer});
     if(sessAns) setActions([{cls:'next',label:'Next',sub:'→',fn:sessAdvance}]); else setActions([]);
   }
@@ -714,19 +720,23 @@ function renderFocus(){
   if(S.session){ renderSession(host); return; }
   const stats=SUBJ.map(x=>subjStats(x.id)); const ranked=stats.slice().sort((a,b)=>b.pri-a.pri);
   try{snapshot(stats)}catch(e){}
-  const ms=nextMilestone(), dEnd=daysTo(S.dates.end), dStart=daysTo(S.dates.start);
   const rated=stats.filter(s=>s.self).length; const size=S.sessSize||25;
   const prev=prevEntry(), today=(S.hist||{})[todayKey()]; const overall=today?today.k:0; const dOv=prev?Math.round(overall-prev.k):null;
-  let cd, cd2=[];
-  if(!ms) cd=dEnd!=null&&dEnd<0?'Course complete':'Set your dates';
-  else cd=ms.days===0?`<b>${ms.label==='oral'?'Oral':'Ride'}</b> today`:`<b>${ms.days}</b> day${ms.days===1?'':'s'} to the ${ms.label}`;
-  if(ms&&ms.label==='oral'&&dEnd!=null&&dEnd>=0) cd2.push(dEnd===0?'ride today':'ride in '+dEnd+(dEnd===1?' day':' days'));
-  if(dStart!=null&&dEnd!=null&&dStart<=0&&dEnd>=0) cd2.push('day '+(1-dStart)+' of '+(dEnd-dStart+1)); else if(dStart!=null&&dStart>0) cd2.push('course starts in '+dStart+(dStart===1?' day':' days'));
-  cd2.push(`${Math.round(overall)}% known${dOv!=null&&dOv!==0?' '+fmtDelta(dOv)+' since yesterday':''}`);
-  let html=`<div class="fhead"><div><div class="cd">${cd}</div><div class="cd2">${cd2.join(' · ')}</div></div><div class="sub">${rated<SUBJ.length?`Rate yourself on ${SUBJ.length-rated} more subject${SUBJ.length-rated===1?'':'s'} below`:'All subjects rated'}<br><button class="link" id="fdates">${datesOpen?'Done':'Dates'}</button></div></div>`;
+  // Header pieces are functions so the Dates inputs can refresh them in place without re-rendering (and losing) the inputs.
+  const headA=()=>{
+    const ms=nextMilestone(), dEnd=daysTo(S.dates.end), dStart=daysTo(S.dates.start);
+    let cd, cd2=[];
+    if(!ms) cd=dEnd!=null&&dEnd<0?'Course complete':'Set your dates';
+    else cd=ms.days===0?`<b>${ms.label==='oral'?'Oral':'Ride'}</b> today`:`<b>${ms.days}</b> day${ms.days===1?'':'s'} to the ${ms.label}`;
+    if(ms&&ms.label==='oral'&&dEnd!=null&&dEnd>=0) cd2.push(dEnd===0?'ride today':'ride in '+dEnd+(dEnd===1?' day':' days'));
+    if(dStart!=null&&dEnd!=null&&dStart<=0&&dEnd>=0) cd2.push('day '+(1-dStart)+' of '+(dEnd-dStart+1)); else if(dStart!=null&&dStart>0) cd2.push('course starts in '+dStart+(dStart===1?' day':' days'));
+    cd2.push(`${Math.round(overall)}% known${dOv!=null&&dOv!==0?' '+fmtDelta(dOv)+' since yesterday':''}`);
+    return `<div class="fhead"><div><div class="cd">${cd}</div><div class="cd2">${cd2.join(' · ')}</div></div><div class="sub">${rated<SUBJ.length?`Rate yourself on ${SUBJ.length-rated} more subject${SUBJ.length-rated===1?'':'s'} below`:'All subjects rated'}<br><button class="link" id="fdates">${datesOpen?'Done':'Dates'}</button></div></div>`;
+  };
+  const headB=()=>{ const tsvg=trendSVG(host); return (tsvg?`<div class="trend">${tsvg}</div>`:'')+(CRUNCH?`<div class="crunch">Final days — anything not seen in 2 days is due again.</div>`:''); };
+  let html=`<div id="fhw1">${headA()}</div>`;
   if(datesOpen) html+=`<div class="fcard"><div class="dates"><label for="d-start">Course start</label><input type="date" id="d-start" value="${esc(S.dates.start)}"><label for="d-oral">Oral <span class="note" style="display:inline">(optional)</span></label><input type="date" id="d-oral" value="${esc(S.dates.oral)}"><label for="d-end">Checkride / last day</label><input type="date" id="d-end" value="${esc(S.dates.end)}"></div><p class="note" style="margin:8px 0 0">The countdown, the trend line and the final-days rule use these. In the last 4 days before the oral, and again before the ride, anything not seen for 2 days comes due again.</p></div>`;
-  const tsvg=trendSVG(host); if(tsvg) html+=`<div class="trend">${tsvg}</div>`;
-  if(CRUNCH) html+=`<div class="crunch">Final days — anything not seen in 2 days is due again.</div>`;
+  html+=`<div id="fhw2">${headB()}</div>`;
   const exam=S.sessMode==='exam';
   html+=`<div class="fstart"><div class="frow2"><span style="font-weight:600">Start a session</span><div class="seg" id="ssize">${[15,25,50].map(n=>`<button data-n="${n}" aria-pressed="${size===n}">${n}</button>`).join('')}</div></div>
     <div class="frow2"><span class="mtxt">Mode</span><div class="seg" id="smode"><button data-m="mix" aria-pressed="${!exam}">Mixed</button><button data-m="exam" aria-pressed="${exam}">Examiner</button></div></div>
@@ -746,8 +756,8 @@ function renderFocus(){
   html+=ranked.map(st=>{ const dl=prev&&prev[st.id]!=null?Math.round(st.mastery*100)-prev[st.id]:null; return `<div class="subj"><span class="sn" data-drill="${st.id}">${esc(SUBJ_BY[st.id].name)}<span class="pri">${st.seen?Math.round(st.mastery*100)+'%':'new'} ${fmtDelta(dl)}</span></span><div class="rate" data-s="${st.id}">${['shaky','ok','solid'].map(r=>`<button data-r="${r}" aria-pressed="${st.self===r}">${r==='ok'?'OK':r[0].toUpperCase()+r.slice(1)}</button>`).join('')}</div><div class="sm"><div class="mbar"><i class="k" style="width:${st.mastery*100}%"></i><i class="g" style="width:${Math.max(0,st.coverage-st.mastery)*100}%"></i></div><span class="mtxt">${esc(whyText(st))}</span></div></div>`; }).join('');
   html+=`</div><p class="note">Green = known, amber = seen but not yet known. ▲▼ = change since yesterday. Your rating sets the starting point; as you drill, what you actually miss takes over.</p>`;
   host.innerHTML=html;
-  $('#fdates').onclick=()=>{datesOpen=!datesOpen; render()};
-  if(datesOpen) [['d-start','start'],['d-oral','oral'],['d-end','end']].forEach(([id,k])=>{ $('#'+id).onchange=e=>{ S.dates[k]=e.target.value||''; CRUNCH=crunch(); save(); render(); } });
+  const bindHead=()=>{ $('#fdates').onclick=()=>{datesOpen=!datesOpen; render()} }; bindHead();
+  if(datesOpen) [['d-start','start'],['d-oral','oral'],['d-end','end']].forEach(([id,k])=>{ $('#'+id).onchange=e=>{ S.dates[k]=e.target.value||''; CRUNCH=crunch(); save(); $('#fhw1').innerHTML=headA(); $('#fhw2').innerHTML=headB(); bindHead(); } });
   $$('#ssize button').forEach(b=>b.onclick=()=>{S.sessSize=+b.dataset.n; save(); render()});
   $$('#smode button').forEach(b=>b.onclick=()=>{S.sessMode=b.dataset.m; save(); render()});
   $$('#stimer button').forEach(b=>b.onclick=()=>{S.timer=+b.dataset.t; save(); render()});
@@ -828,11 +838,11 @@ function renderDeck(sec){
   if(cur[sec]>=list.length) cur[sec]=0;
   const c=list[cur[sec]];
   host.innerHTML=(pinned?`<div class="pinnote"><span>Opened from search</span><button class="link" id="unpin">Back to the deck</button></div>`:'')+(sec==='memory'?memoryCard(c):sec==='limits'?limitCard(c):sec==='joggers'?joggerCard(c):sec==='orals'?oralCard(c):sysCard(c))+(pinned?'':`<p class="note" style="text-align:center;margin-top:10px">${cur[sec]+1} of ${list.length}</p>`);
-  if(pinned) $('#unpin').onclick=()=>{pin=null;revealed=false;render()};
+  if(pinned) $('#unpin',host).onclick=()=>{pin=null;revealed=false;render()};
   const ab=$('.askb',host); if(ab) ab.onclick=(e)=>{e.stopPropagation(); openAsk(cardCtx(sec,c))};
   if(!revealed) setActions([{cls:'reveal',label:'Reveal',sub:'space',fn:()=>{revealed=true;render()}}]);
   else setActions([{cls:'miss',label:'Missed',sub:'1 · back to box 0',fn:()=>grade(sec,c.key,false)},{cls:'hit',label:'Got it',sub:'2 · back in '+INTERVAL_LABEL[Math.min(4,rec(c.key).box+1)],fn:()=>grade(sec,c.key,true)}]);
-  $('#card').onclick=()=>{if(!revealed){revealed=true;render()}};
+  $('#card',host).onclick=()=>{if(!revealed){revealed=true;render()}};
 }
 function setActions(list){
   const a=$('#actions'), inn=$('#act-in');
@@ -876,7 +886,7 @@ function renderOralsRead(){
     }
     return `<div class="oral"><div class="ohead"><h2>${esc(o.title)}</h2><div class="osrc">${esc(o.source)}</div><div class="oscen">${esc(o.scenario)}</div><div class="otools"><button class="link" data-all="${o.id}" data-open="${allOpen?0:1}">${allOpen?'Hide all answers':'Show all answers'}</button><span class="note" style="margin:0">tap a question to reveal its answer</span></div></div>${out}</div>`;
   }).join('');
-  $$('.oqa',host).forEach(el=>el.querySelector('.oq').onclick=()=>{const k=el.dataset.k;S.oralOpen[k]=!S.oralOpen[k];save();el.classList.toggle('open',S.oralOpen[k])});
+  $$('.oqa',host).forEach(el=>el.querySelector('.oq').onclick=()=>{const k=el.dataset.k;S.oralOpen[k]=!S.oralOpen[k];save();el.classList.toggle('open',S.oralOpen[k]); const oid=k.split(':')[0], o=D.orals.find(x=>x.id===oid), b=$('[data-all="'+oid+'"]',host); if(o&&b){const all=o.qa.every(q=>S.oralOpen[oid+':'+q.n]); b.dataset.open=all?0:1; b.textContent=all?'Hide all answers':'Show all answers'}});
   $$('.oa .askb',host).forEach(b=>b.onclick=(e)=>{e.stopPropagation(); const [oid,n]=b.dataset.ask.split(':'); const o=D.orals.find(x=>x.id===oid); const q=o.qa.find(x=>String(x.n)===n); openAsk({key:'O:'+oid+':'+n,label:o.title+' · Q'+n,text:'Scenario: '+o.scenario+'\nExaminer question: '+q.q+'\nSheet answer: '+(q.a||'(none given)')})});
   $$('[data-all]',host).forEach(b=>b.onclick=()=>{const o=D.orals.find(x=>x.id===b.dataset.all);const v=b.dataset.open==='1';for(const q of o.qa)S.oralOpen[o.id+':'+q.n]=v;save();render()});
   setActions([]);
@@ -894,7 +904,7 @@ function qpool(){
   const m=S.mode.quiz; if(m==='missed') list=list.filter(q=>qrec(q.id).last===false); else if(m==='unseen') list=list.filter(q=>qrec(q.id).hit+qrec(q.id).miss===0);
   if(S.shuf.quiz) list=seeded(list,S.shuf.quiz); return list;
 }
-let session={hit:0,miss:0};
+let session={hit:0,miss:0}, qHold=null;
 function renderQuiz(){
   const all=S.filt.quiz==='all'?D.quiz:D.quiz.filter(q=>q.ch===S.filt.quiz);
   let right=0,wrong=0,un=0; for(const q of all){const r=qrec(q.id); if(r.last===true)right++; else if(r.last===false)wrong++; else un++;}
@@ -906,17 +916,20 @@ function renderQuiz(){
   $('#f-quiz').innerHTML=chs.map(c=>`<button class="chip" data-f="${c.id}" aria-pressed="${S.filt.quiz===c.id}">${esc(c.label)}<span class="c">${c.id==='all'?D.quiz.length:counts[c.id]}</span></button>`).join('');
   $$('#f-quiz .chip').forEach(b=>b.onclick=()=>{S.filt.quiz=b.dataset.f;cur.quiz=0;answered=null;save();render()});
   const list=qpool(); const host=$('#c-quiz');
-  if(!list.length){host.innerHTML=`<div class="empty"><b>Empty</b>No questions match this filter.</div>`;setActions([]);return}
-  if(cur.quiz>=list.length)cur.quiz=0;
-  const q=list[cur.quiz];
+  // An answered question can drop out of the "Not yet tried" / "Missed" filter — keep it on screen until Next.
+  const heldQ=answered&&qHold?D.quiz.find(x=>x.id===qHold):null; const held=!!heldQ&&!list.includes(heldQ);
+  if(!list.length&&!held){host.innerHTML=`<div class="empty"><b>Empty</b>No questions match this filter.</div>`;setActions([]);return}
+  if(!held&&cur.quiz>=list.length)cur.quiz=0;
+  const q=held?heldQ:list[cur.quiz];
   host.innerHTML=`<div class="card" id="card"><div class="top"><span><span class="id">Ch ${esc(q.section.split(' ')[0])} · Q${q.n}</span> · PTM review question</span><span style="display:inline-flex;align-items:center;gap:8px">${qrec(q.id).last===true?'✓ last time':qrec(q.id).last===false?'✗ last time':''}<button class="askb" data-ask>Ask</button></span></div>
     <div class="body"><div class="kind">${esc(q.section)}</div><h2 class="q">${esc(q.q)}</h2><div class="opts">${['a','b','c','d'].map(k=>`<button class="opt ${answered?(k===q.answer?'right':(k===answered?'wrong':'')):''}" data-k="${k}" ${answered?'disabled':''}><span class="k">${k}</span><span>${esc(q.options[k])}</span></button>`).join('')}</div></div></div>
-    <p class="note" style="text-align:center;margin-top:10px">${cur.quiz+1} of ${list.length}</p>`;
+    <p class="note" style="text-align:center;margin-top:10px">${held?Math.min(cur.quiz+1,list.length+1)+' of '+(list.length+1):(cur.quiz+1)+' of '+list.length}</p>`;
   $$('.opt',host).forEach(b=>b.onclick=()=>answer(q,b.dataset.k));
   const qa=$('.askb',host); if(qa) qa.onclick=()=>openAsk({key:'Q:'+q.id,label:'Quiz · '+q.section+' · Q'+q.n,text:'Review question: '+q.q+'\nOptions: '+['a','b','c','d'].map(k=>k+') '+q.options[k]).join('; ')+'\nAnswer key: '+q.answer});
-  if(answered) setActions([{cls:'next',label:'Next',sub:'→',fn:()=>{answered=null;cur.quiz++;render()}}]); else setActions([]);
+  if(answered) setActions([{cls:'next',label:'Next',sub:'→',fn:()=>quizNext(held)}]); else setActions([]);
 }
-function answer(q,k){ if(answered)return; answered=k; const r=qrec(q.id); const ok=k===q.answer; if(ok){r.hit++;session.hit++}else{r.miss++;session.miss++} r.last=ok; S.quiz[q.id]=r; save(); if(ok) celebrate($('.opt[data-k="'+k+'"]'),false); else streak=0; render(); }
+function quizNext(held){ answered=null; qHold=null; if(!held) cur.quiz++; render(); }
+function answer(q,k){ if(answered)return; answered=k; qHold=q.id; const r=qrec(q.id); const ok=k===q.answer; if(ok){r.hit++;session.hit++}else{r.miss++;session.miss++} r.last=ok; S.quiz[q.id]=r; save(); if(ok) celebrate($('.opt[data-k="'+k+'"]'),false); else streak=0; render(); }
 
 // ---------- guide ----------
 function renderGuide(){
@@ -936,7 +949,8 @@ function termsOf(text){
   for(const m of (text.match(/\d[\d,]*(?:\.\d+)?/g)||[])){const n=m.replace(/,/g,''); if(n.replace('.','').length>=2&&!seen.has('n'+n)){seen.add('n'+n); t.push({w:4,p:'(?<![-\\d.])\\b'+n.replace(/\./g,'\\.').replace(/(\d)(?=\d)/g,'$1,?')+'\\b(?![-\\d.])'})}}
   for(const m of (text.match(/\b[A-Z][A-Z0-9\/]{1,7}\b/g)||[])){const a=m.replace(/\//g,''); if(a.length>=2&&!/^\d+$/.test(a)&&!seen.has('a'+a)){seen.add('a'+a); t.push({w:2.5,p:'\\b'+m.replace(/[.*+?^${}()|[\]\\\/]/g,'\\$&')})}}
   for(const m of (text.toLowerCase().match(/[a-z][a-z\-]{3,}/g)||[])){ if(STOP.has(m)||seen.has('w'+m)) continue; seen.add('w'+m); const stem=m.length>=7?m.slice(0,m.length-2):m; t.push({w:1,p:'\\b'+stem.replace(/[-]/g,'\\-')}); }
-  return t.slice(0,40).map(x=>({w:x.w,re:new RegExp(x.p,'i'),g:new RegExp(x.p,'gi')}));
+  const mk=(pat)=>{ try{ return new RegExp(pat,'i') }catch(e){ return new RegExp(pat.replace('(?<![-\\d.])','').replace('(?![-\\d.])',''),'i') } }; // older Safari has no lookbehind — fall back to the plain number
+  return t.slice(0,40).map(x=>{const re=mk(x.p); return {w:x.w,re,g:new RegExp(re.source,'gi')}});
 }
 function scoreText(text,terms){let s=0; for(const t of terms){ if(t.re.test(text)) s+=t.w } return s}
 let PASSAGES=null;
@@ -1020,7 +1034,7 @@ function openAsk(ctx){
   if(sampleFn||!('ontouchstart' in window)) setTimeout(()=>$('#sq').focus(),50);
 }
 function askOffline(){ const q=$('#sq').value.trim(); if(!q) return; closeAsk(); openSearch(); qEl.value=q; query=q; render(); window.scrollTo({top:0}); }
-function closeAsk(){ if(askCtl){askCtl.abort(); askCtl=null} $('#sheetbg').hidden=true; $('#sheet').hidden=true; }
+function closeAsk(){ if(askCtl){askCtl.abort(); askCtl=null} $('#sheetbg').hidden=true; $('#sheet').hidden=true; if(S.tab==='focus'&&S.session&&!S.session.done&&!revealed&&S.timer&&$('#tbar')) render(); }
 const ASK_ERR={not_granted:'Claude is not allowed for this page on your account — you can allow it from the page menu.',sampling_disabled:'Claude is not available on this account.',rate_limited:'Too many questions in a row — give it a minute and try again.',session_expired:'Your claude.ai sign-in expired — sign in again and retry.',refused:'Claude declined that one. Try rewording the question.',prompt_too_large:'That section is too long to send — try a more specific card.',upstream_error:'Connection hiccup — try again.',empty_completion:'No answer came back — try rewording.'};
 async function askSend(q){
   q=(q||$('#sq').value).trim(); if(!q||!sampleFn||!askCtx) return;
@@ -1051,12 +1065,12 @@ $('#sclosebtn').onclick=closeAsk; $('#sheetbg').onclick=closeAsk;
 let INDEX=null;
 function buildIndex(){
   const ix=[];
-  for(const c of DECKS.limits) ix.push({type:'limits',g:'Limitations',sub:c.id,title:c.title,text:c.items.map(i=>i.label+': '+i.value).join(' · '),open:()=>pinCard('limits',c.key)});
-  for(const c of DECKS.memory) ix.push({type:'memory',g:'Memory items',sub:c.id,title:c.title,text:c.steps.join(' · '),open:()=>pinCard('memory',c.key)});
-  for(const c of DECKS.joggers) ix.push({type:'joggers',g:'Memory joggers',sub:c.id+' · '+c.section,title:c.v+' — '+c.a,text:'',open:()=>pinCard('joggers',c.key)});
-  for(const c of DECKS.systems) ix.push({type:'systems',g:'Systems cards',sub:c.section,title:c.q,text:c.a+(c.ref?' ('+c.ref+')':''),open:()=>pinCard('systems',c.key)});
-  D.quiz.forEach((q,i)=>ix.push({type:'quiz',g:'Quiz',sub:q.section+' · Q'+q.n,title:q.q,text:['a','b','c','d'].map(k=>k+') '+q.options[k]).join('  ')+'  — answer: '+q.answer,open:()=>jumpQuiz(q)}));
-  for(const c of DECKS.orals) ix.push({type:'orals',g:'Mock orals',sub:c.oralTitle+' · Q'+c.n,title:c.q,text:c.a,open:()=>jumpOral(c)});
+  for(const c of DECKS.limits) ix.push({type:'limits',key:c.key,g:'Limitations',sub:c.id,title:c.title,text:c.items.map(i=>i.label+': '+i.value).join(' · '),open:()=>pinCard('limits',c.key)});
+  for(const c of DECKS.memory) ix.push({type:'memory',key:c.key,g:'Memory items',sub:c.id,title:c.title,text:c.steps.join(' · '),open:()=>pinCard('memory',c.key)});
+  for(const c of DECKS.joggers) ix.push({type:'joggers',key:c.key,g:'Memory joggers',sub:c.id+' · '+c.section,title:c.v+' — '+c.a,text:'',open:()=>pinCard('joggers',c.key)});
+  for(const c of DECKS.systems) ix.push({type:'systems',key:c.key,g:'Systems cards',sub:c.section,title:c.q,text:c.a+(c.ref?' ('+c.ref+')':''),open:()=>pinCard('systems',c.key)});
+  D.quiz.forEach((q,i)=>ix.push({type:'quiz',key:'Q:'+q.id,g:'Quiz',sub:q.section+' · Q'+q.n,title:q.q,text:['a','b','c','d'].map(k=>k+') '+q.options[k]).join('  ')+'  — answer: '+q.answer,open:()=>jumpQuiz(q)}));
+  for(const c of DECKS.orals) ix.push({type:'orals',key:c.key,g:'Mock orals',sub:c.oralTitle+' · Q'+c.n,title:c.q,text:c.a,open:()=>jumpOral(c)});
   const dp=new DOMParser();
   D.chapters.forEach((ch,ci)=>{
     const doc=dp.parseFromString('<div id="r">'+ch.html+'</div>','text/html'); const root=doc.getElementById('r');
@@ -1103,7 +1117,7 @@ function renderSearch(){
   $$('.res',host).forEach(b=>b.onclick=()=>{const g=groups.get(b.dataset.t); g[+b.dataset.i].e.open()});
 }
 function pinCard(sec,key){ closeSearch(); S.tab=sec; pin={sec,key}; revealed=true; save(); render(); window.scrollTo({top:0}); }
-function jumpQuiz(q){ closeSearch(); S.tab='quiz'; S.mode.quiz='all'; S.filt.quiz=q.ch; S.shuf.quiz=0; answered=null; cur.quiz=D.quiz.filter(x=>x.ch===q.ch).indexOf(q); save(); render(); window.scrollTo({top:0}); }
+function jumpQuiz(q){ closeSearch(); S.tab='quiz'; S.mode.quiz='all'; S.filt.quiz=q.ch; S.shuf.quiz=0; const sb=$('[data-shuffle="quiz"]'); if(sb) sb.textContent='Shuffle'; answered=null; cur.quiz=D.quiz.filter(x=>x.ch===q.ch).indexOf(q); save(); render(); window.scrollTo({top:0}); }
 function jumpOral(c){ closeSearch(); S.tab='orals'; S.mode.orals='read'; S.filt.orals=c.oral; S.oralOpen[c.oral+':'+c.n]=true; save(); render(); const el=$('.oqa[data-k="'+c.oral+':'+c.n+'"]'); if(el){el.scrollIntoView({block:'start'}); el.classList.add('gflash')} }
 function jumpGuide(ci,k,termsIn){ const regs=termsIn?termsIn.filter(t=>t.w>=2).map(t=>t.g):qregs(query); closeSearch(); S.tab='guide'; S.guide=ci; save(); render();
   const h=k>=0?$('#gh-'+k):$('#g-body h2'); if(!h) return;
@@ -1129,7 +1143,7 @@ function render(){
   const searching=query.trim().length>=2;
   $$('.tab').forEach(t=>t.setAttribute('aria-selected',!searching&&t.dataset.t===S.tab));
   if(S.tab==='plan') S.tab='focus';
-  ['memory','limits','systems','joggers','orals','quiz','guide','focus'].forEach(p=>$('#p-'+p).hidden=searching||p!==S.tab);
+  ['memory','limits','systems','joggers','orals','quiz','guide','focus'].forEach(p=>{ const hide=searching||p!==S.tab; $('#p-'+p).hidden=hide; if(hide&&p!=='guide'){ const c=$('#c-'+p); if(c&&c.innerHTML) c.innerHTML=''; } });
   $('#p-search').hidden=!searching;
   if(searching){renderSearch(); setActions([]); updateTot(); return;}
   if(S.tab==='memory'||S.tab==='limits'||S.tab==='systems'||S.tab==='joggers') renderDeck(S.tab);
@@ -1156,7 +1170,7 @@ document.addEventListener('keydown',e=>{
   if(inSess&&sit&&sit.kind==='quiz'){ if(/^[a-d]$/.test(e.key)&&!sessAns){const b=$('.opt[data-k="'+e.key+'"]');b&&b.click()} else if((e.key==='ArrowRight'||e.key===' '||e.key==='Enter')&&sessAns){e.preventDefault();sessAdvance()} return }
   const deck=['memory','limits','systems','joggers'].includes(S.tab)||(S.tab==='orals'&&S.mode.orals!=='read')||(inSess&&sit&&sit.kind==='card');
   if(deck){ if(e.key===' '||e.key==='Enter'){e.preventDefault();if(!revealed){revealed=true;render()}} else if(e.key==='1'&&revealed){actionsList[0]&&actionsList[0].fn()} else if(e.key==='2'&&revealed){actionsList[1]&&actionsList[1].fn()} }
-  else if(S.tab==='quiz'){ if(/^[a-d]$/.test(e.key)&&!answered){const b=$('.opt[data-k="'+e.key+'"]');b&&b.click()} else if((e.key==='ArrowRight'||e.key===' '||e.key==='Enter')&&answered){e.preventDefault();answered=null;cur.quiz++;render()} }
+  else if(S.tab==='quiz'){ if(/^[a-d]$/.test(e.key)&&!answered){const b=$('.opt[data-k="'+e.key+'"]');b&&b.click()} else if((e.key==='ArrowRight'||e.key===' '||e.key==='Enter')&&answered){e.preventDefault();const nb=$('#act-in .btn.next'); if(nb) nb.click(); else quizNext(false)} }
 });
 const jd=$('#jdir'); const jlbl=()=>{jd.textContent=S.jdir==='meaning'?'Show number first':'Show meaning first'}; jd.onclick=()=>{S.jdir=S.jdir==='meaning'?'value':'meaning';revealed=false;save();jlbl();render()}; jlbl();
 chipsSystems(); chipsJoggers(); render(); setHH();
