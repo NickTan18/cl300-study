@@ -1192,6 +1192,8 @@ const FIGS=D.figs||[];
 const FIGPACK={}; let FIGDIR=null;   // packs live in figs/ — or beside index.html if they were uploaded flat
 function loadPack(subj){
   if(FIGPACK[subj]) return FIGPACK[subj];
+  const inl=document.getElementById('fp-'+subj);   // offline build: packs are embedded in the page
+  if(inl){ FIGPACK[subj]=Promise.resolve().then(()=>{ const pk=JSON.parse(inl.textContent); const m={}; for(const fg in pk) m[fg]={t:'data:image/jpeg;base64,'+pk[fg].t,f:'data:image/jpeg;base64,'+pk[fg].f}; return m; }); return FIGPACK[subj]; }
   const get=dir=>fetch(dir+subj+'.json').then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
   const tryDirs=FIGDIR!=null?get(FIGDIR).then(pk=>[FIGDIR,pk]):get('figs/').then(pk=>['figs/',pk]).catch(()=>get('').then(pk=>['',pk]));
   FIGPACK[subj]=tryDirs.then(([dir,pk])=>{ FIGDIR=dir; const m={}; for(const fg in pk) m[fg]={t:'data:image/jpeg;base64,'+pk[fg].t,f:'data:image/jpeg;base64,'+pk[fg].f}; return m; })
